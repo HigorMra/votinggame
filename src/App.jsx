@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Activity, ArrowDownRight, ArrowRight, ChevronDown, ChevronUp, CircleHelp, Clock3, Gift, Heart, Keyboard, Plus, Radio, RotateCcw, Settings2, Sparkles, Users, Wifi, WifiOff, X } from 'lucide-react'
+import { Activity, ArrowDownRight, ArrowRight, ChevronDown, ChevronUp, CircleHelp, Clock3, Gift, Heart, Keyboard, Pause, Play, Plus, Radio, RotateCcw, Settings2, Sparkles, Users, Volume2, VolumeX, Wifi, WifiOff, X } from 'lucide-react'
 import { connectLive } from './live.js'
 import { getVoteDelta } from './vote-math.js'
 import './matchup.css'
@@ -74,6 +74,7 @@ const initialScores = { left: 0, right: 0 }
 const initialGifts = { left: 0, right: 0 }
 const MATCH_DURATION = 5 * 60
 const autoConnectOnLoad = import.meta.env.VITE_AUTO_CONNECT === 'true'
+const autoPlayMusic = new URLSearchParams(window.location.search).get('audio') === '1'
 
 function randomMatchup(previous) {
   let next
@@ -156,12 +157,13 @@ function SideCard({ side, candidate, score, total, percent, gifts, pressed, rose
   </Panel>
 }
 
-function FloatingControls({ open, setOpen, onVote, onReset, scores, liveStatus, selectedCandidates, round }) {
+function FloatingControls({ open, setOpen, onVote, onReset, scores, liveStatus, selectedCandidates, round, audioPlaying, onToggleAudio, audioVolume, onAudioVolumeChange, audioError }) {
   return <>
     <motion.button className="control-toggle" onClick={() => setOpen(!open)} whileTap={{ scale: .94 }} aria-label="Abrir painel de controle"><Settings2 size={16}/><span>CONTROLES</span>{open ? <ChevronDown size={14}/> : <ChevronUp size={14}/>}</motion.button>
     <AnimatePresence>{open && <motion.div className="control-panel panel" initial={{ opacity: 0, y: 22, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: .97 }} transition={{ duration: .2 }}>
       <div className="control-heading"><div className="control-heading-icon"><Keyboard size={16}/></div><div><strong>PAINEL DO CRIADOR</strong><span>Rodada {round} · o x1 troca a cada 5 minutos</span></div><button className="icon-button control-close" onClick={() => setOpen(false)} aria-label="Fechar controles"><X size={16}/></button></div>
       <div className="control-buttons"><button className="manual-vote vote-blue" onClick={() => onVote('left')}><Plus size={17}/><span><b>+1 Rosa · {selectedCandidates.left.name}</b><small>Simular apoio na esquerda</small></span><span className="manual-number">E</span></button><button className="manual-vote vote-red" onClick={() => onVote('right')}><Plus size={17}/><span><b>+1 Rosa · {selectedCandidates.right.name}</b><small>Simular apoio na direita</small></span><span className="manual-number">D</span></button></div>
+      <div className="audio-controls"><button className="audio-toggle" onClick={onToggleAudio} aria-pressed={audioPlaying}>{audioPlaying ? <Pause size={15}/> : <Play size={15}/>}<span><b>{audioPlaying ? 'PAUSAR SOM' : 'ATIVAR FUNK EM LOOP'}</b><small>Funk da urna eletrônica 2026</small></span>{audioPlaying ? <Volume2 size={16}/> : <VolumeX size={16}/>}</button><label className="audio-volume"><span>VOLUME</span><input type="range" min="0" max="1" step="0.05" value={audioVolume} onChange={(event) => onAudioVolumeChange(Number(event.target.value))} aria-label="Volume do funk"/><b>{Math.round(audioVolume * 100)}%</b></label>{audioError && <small className="audio-error">Não foi possível iniciar o áudio. Tente ativar novamente.</small>}</div>
       <div className="control-bottom"><span><i className={`status-dot ${liveStatus === 'connected' ? 'dot-live' : ''}`}/>{liveStatus === 'connected' ? 'Live conectada' : 'Aguardando TikTok LIVE'}</span><button onClick={onReset}><RotateCcw size={12}/> REINICIAR PLACAR</button></div>
       <div className="control-footnote">PLACAR ATUAL <b>{scoreFormat(scores.left)}</b><span>—</span><b>{scoreFormat(scores.right)}</b></div>
     </motion.div>}</AnimatePresence>
@@ -186,9 +188,13 @@ function App() {
   const [connected, setConnected] = useState(autoConnectOnLoad)
   const [helpOpen, setHelpOpen] = useState(false)
   const [events, setEvents] = useState([])
+  const [audioPlaying, setAudioPlaying] = useState(false)
+  const [audioVolume, setAudioVolume] = useState(0.25)
+  const [audioError, setAudioError] = useState(false)
   const seq = useRef(0)
   const resetTimer = useRef()
   const sourceCleanups = useRef([])
+  const audioRef = useRef(null)
 
   const candidatesBySide = useMemo(() => ({
     left: CANDIDATES.left.find((candidate) => candidate.id === matchup.left),
@@ -264,6 +270,35 @@ function App() {
     setConnected(false); setLiveStatus('disconnected'); setLiveUsername('')
   }
 
+  const toggleAudio = async () => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (!audio.paused) {
+      audio.pause()
+      setAudioPlaying(false)
+      return
+    }
+    audio.volume = audioVolume
+    setAudioError(false)
+    try {
+      await audio.play()
+      setAudioPlaying(true)
+    } catch {
+      setAudioPlaying(false)
+      setAudioError(true)
+    }
+  }
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = audioVolume
+  }, [audioVolume])
+
+  useEffect(() => {
+    if (!autoPlayMusic || !audioRef.current) return
+    audioRef.current.volume = audioVolume
+    audioRef.current.play().then(() => setAudioPlaying(true)).catch(() => setAudioError(true))
+  }, [])
+
   return <main className="app-shell">
     <div className="ambient-glow glow-one"/><div className="ambient-glow glow-two"/>
     <header className="topbar">
@@ -283,7 +318,9 @@ function App() {
 
     <footer className="site-footer"><span>© 2026 VOTO LIVE <span className="footer-dot">·</span> FOTOS DE CANDIDATURAS · TSE 2026</span><span className="footer-powered"><span/><span>FEITO PARA A COMUNIDADE</span><Heart size={11}/></span></footer>
 
-    <FloatingControls open={panelOpen} setOpen={setPanelOpen} onVote={(side) => addVote(side, 1)} onReset={resetGame} scores={scores} liveStatus={liveStatus} selectedCandidates={candidatesBySide} round={round}/>
+      <FloatingControls open={panelOpen} setOpen={setPanelOpen} onVote={(side) => addVote(side, 1)} onReset={resetGame} scores={scores} liveStatus={liveStatus} selectedCandidates={candidatesBySide} round={round} audioPlaying={audioPlaying} onToggleAudio={toggleAudio} audioVolume={audioVolume} onAudioVolumeChange={setAudioVolume} audioError={audioError}/>
+
+      <audio ref={audioRef} src="/audio/funk-da-urna-2026.mp3" loop preload="auto" onPlay={() => setAudioPlaying(true)} onPause={() => setAudioPlaying(false)} />
 
     <AnimatePresence>{showConnect && <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(event) => { if (event.target === event.currentTarget) setShowConnect(false) }}><motion.form className="connect-modal panel" onSubmit={connectToLive} initial={{ opacity: 0, y: 15, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: .98 }}><button className="icon-button modal-close" type="button" onClick={() => setShowConnect(false)} aria-label="Fechar"><X size={17}/></button><div className="modal-icon"><Radio size={21}/></div><span className="modal-overline">CONECTAR TRANSMISSÃO</span><h2>Entre na disputa</h2><p>Conecte seu usuário do TikTok Live para computar rosas da transmissão.</p><label className="input-label" htmlFor="live-username">USUÁRIO DO TIKTOK</label><div className="username-input"><span>@</span><input id="live-username" autoFocus placeholder="seu.usuario" value={inputUsername} onChange={(event) => setInputUsername(event.target.value)} /></div><div className="connection-note"><WifiOff size={14}/><span>Para receber eventos reais, rode o adaptador do servidor com <code>TIKTOK_USERNAME</code>.</span></div><button className="modal-submit" type="submit">CONECTAR LIVE <ArrowRight size={15}/></button><button className="demo-link" type="button" onClick={() => { setShowConnect(false); setPanelOpen(true) }}>Continuar no modo demonstração</button></motion.form></motion.div>}</AnimatePresence>
 
