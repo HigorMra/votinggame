@@ -37,7 +37,7 @@ O servidor filtra rosas pelo nome do presente e trata sequências de presentes s
 
 ## Publicar a interface no Netlify
 
-O arquivo `netlify.toml` já configura `npm run build` e a pasta `dist`. Importe o repositório no Netlify e publique o site. Defina `VITE_LIVE_WS_URL` nas variáveis de ambiente do site com o endereço seguro do adaptador Node, por exemplo `wss://seu-adaptador.example.com/live`, e faça um novo deploy. Copie esse endereço para `.env` local se quiser apontar o dev server para o adaptador hospedado.
+O arquivo `netlify.toml` configura `npm run build`, a pasta `dist`, o WebSocket seguro do Render (`wss://voto-live-adapter.onrender.com/live`) e a conexão automática da fonte hospedada. Importe `HigorMra/votinggame` no Netlify e publique o site. O browser aberto no LIVE Studio se conectará ao backend automaticamente; localmente, a tela continua em modo demonstração até você conectar manualmente.
 
 O adaptador TikTok é um processo Node persistente e deve ser hospedado separadamente em um serviço que aceite WebSockets. O Netlify serve a interface estática; não execute `npm run server` dentro de uma função serverless do Netlify esperando que uma conexão WebSocket permaneça ativa.
 
@@ -45,4 +45,4 @@ O arquivo `render.yaml` define um serviço web gratuito no Render, com health ch
 
 ## Usar no TikTok LIVE Studio
 
-Depois que a URL pública do Netlify estiver no ar, adicione uma fonte **Browser / Navegador** à cena e informe a URL HTTPS do site. Ajuste a largura e a altura conforme o canvas da live, posicione o placar na cena e deixe a fonte visível. Teste primeiro com os botões do painel local e depois com uma Rose real, com o adaptador Node conectado. A interface precisa acessar o adaptador por `wss://` para receber presentes dentro de uma página HTTPS.
+Depois que a URL pública do Netlify estiver no ar, adicione uma fonte **Browser / Navegador** à cena e informe a URL HTTPS do site. Ajuste a largura e a altura conforme o canvas da live e posicione o placar na cena. A página hospedada se conecta sozinha ao WebSocket do Render. Teste as animações com os botões do painel; uma Rose real só atualizará o placar quando a conta `t.hetaxman` estiver ao vivo e o conector estiver conectado. Isso prepara a fonte e o receptor sem iniciar ou publicar uma transmissão.

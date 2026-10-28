@@ -5,6 +5,7 @@ import { connectLive } from './live.js'
 
 const initialScores = { '22': 508, '13': 181 }
 const initialGifts = { '22': 24, '13': 9 }
+const autoConnectOnLoad = import.meta.env.VITE_AUTO_CONNECT === 'true'
 const SIDE_META = {
   '22': { name: 'LUCAS FERREIRA', party: 'PARTIDO AZUL', color: 'blue', initial: 'LF', sprite: '🧑🏽‍💼' },
   '13': { name: 'MARINA COSTA', party: 'PARTIDO VERMELHO', color: 'red', initial: 'MC', sprite: '👩🏻‍💼' },
@@ -97,11 +98,11 @@ function App() {
   const [pressedSide, setPressedSide] = useState(null)
   const [roseEvents, setRoseEvents] = useState({ '22': [], '13': [] })
   const [panelOpen, setPanelOpen] = useState(false)
-  const [liveStatus, setLiveStatus] = useState('disconnected')
-  const [liveUsername, setLiveUsername] = useState('')
+  const [liveStatus, setLiveStatus] = useState(autoConnectOnLoad ? 'connecting' : 'disconnected')
+  const [liveUsername, setLiveUsername] = useState(autoConnectOnLoad ? 't.hetaxman' : '')
   const [showConnect, setShowConnect] = useState(false)
   const [inputUsername, setInputUsername] = useState('')
-  const [connected, setConnected] = useState(false)
+  const [connected, setConnected] = useState(autoConnectOnLoad)
   const [helpOpen, setHelpOpen] = useState(false)
   const [events, setEvents] = useState([])
   const seq = useRef(0)
@@ -142,7 +143,7 @@ function App() {
   useEffect(() => () => { window.clearTimeout(resetTimer.current); sourceCleanups.current.forEach((cleanup) => cleanup()) }, [])
 
   useEffect(() => {
-    if (!connected || !liveUsername) return undefined
+    if (!connected || (!liveUsername && !autoConnectOnLoad)) return undefined
     const timer = window.setTimeout(() => {
       const cleanup = connectLive((event) => addVote(event.side, event.quantity, event.username), setLiveStatus)
       sourceCleanups.current.push(cleanup)

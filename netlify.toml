@@ -1,3 +1,7 @@
 [build]
   command = "npm run build"
   publish = "dist"
+
+[build.environment]
+  VITE_LIVE_WS_URL = "wss://voto-live-adapter.onrender.com/live"
+  VITE_AUTO_CONNECT = "true"
