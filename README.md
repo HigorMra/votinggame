@@ -17,17 +17,18 @@ TIKTOK_USERNAME=seu_usuario npm run server
 
 O conector requer o nome de usuário público do criador que está ao vivo. Configure `TIKTOK_USERNAME` com esse usuário antes de iniciar o servidor. O adaptador escuta presentes `Rose` e publica eventos JSON em `ws://localhost:3001/live`; `http://localhost:3001/health` mostra o estado da conexão. O browser React já reconecta ao WebSocket automaticamente.
 
-O x1 inicia com Erika Hilton (esquerda) e Nikolas Ferreira (direita). Use os menus nas cartas para escolher entre os nomes cadastrados em cada espectro. A troca de qualquer candidato reinicia o placar da rodada para não atribuir apoios antigos ao novo nome. Cada Rosa vira um apoio no placar da live; o número eleitoral informado aparece separado como referência.
+O x1 sorteia um candidato de cada espectro ao abrir e gera um novo confronto a cada cinco minutos, sem repetir o mesmo par em rodadas consecutivas. A troca automática zera o placar; não há seletor de candidatos na tela. Cada Rosa vira um apoio no placar, enquanto os votos eleitorais aparecem separados como referência. As 52 fotos são retratos oficiais das candidaturas de 2026 publicados pelo TSE e ficam em `public/candidates/`.
 
-Na live, cada espectador pode escrever `ESQUERDA` ou `DIREITA` no chat antes de enviar a Rosa. A escolha fica vinculada ao usuário e vale para os próximos presentes. Sem comando prévio, a Rosa vai para a esquerda. Se quiser fixar lados para usuários específicos, `SIDE_LEFT_USERS` e `SIDE_RIGHT_USERS` têm prioridade sobre o comando do chat. No PowerShell:
+Na live, cada espectador pode escrever `ESQUERDA` ou `DIREITA` no chat antes de enviar a Rosa. A escolha fica vinculada ao usuário e vale para as próximas rosas. Sem comando prévio, a Rosa vai para a esquerda. Os nomes em `SIDE_LEFT_USERS` e `SIDE_RIGHT_USERS` podem ser fixados para um lado e têm prioridade sobre o comando do chat. No PowerShell:
 
 ```powershell
 $env:TIKTOK_USERNAME = "seu_usuario"
 $env:SIDE_LEFT_USERS = "usuario_esquerda1,usuario_esquerda2"
+$env:SIDE_RIGHT_USERS = "usuario_direita1,usuario_direita2"
 npm run server
 ```
 
-O servidor filtra rosas pelo nome do presente e trata sequências de presentes sem contar atualizações intermediárias duas vezes. Cada evento enviado tem `type`, `side` (`left` ou `right`), `quantity`, `username`, `giftName`, `giftId` e `timestamp`.
+O servidor filtra rosas pelo nome do presente e trata sequências de presentes sem contar atualizações intermediárias duas vezes. Cada evento enviado tem `type`, `side` (`left` ou `right`), `quantity`, `username`, `giftName`, `giftId` e `timestamp`. Clicar em uma urna também anima uma flor e acrescenta um apoio local para demonstrar o efeito.
 
 > `tiktok-live-connector` é uma integração de terceiros não oficial. Eventos e disponibilidade podem mudar; mantenha credenciais e conexão no backend. O navegador se conecta a `ws://localhost:3001/live` sem expor a conexão do TikTok.
 
