@@ -26,7 +26,7 @@ export function connectLive(onRose, onStatus) {
       try {
         const payload = JSON.parse(event.data)
         if (payload.type === 'status') onStatus(payload.status)
-        if (payload.type === 'rose' && (payload.side === '22' || payload.side === '13')) onRose(payload)
+        if (payload.type === 'rose' && (payload.side === 'left' || payload.side === 'right')) onRose(payload)
       } catch { /* Ignore malformed or unrelated socket messages. */ }
     })
     socket.addEventListener('error', () => { onStatus('disconnected') })

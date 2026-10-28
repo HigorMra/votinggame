@@ -17,15 +17,17 @@ TIKTOK_USERNAME=seu_usuario npm run server
 
 O conector requer o nome de usuário público do criador que está ao vivo. Configure `TIKTOK_USERNAME` com esse usuário antes de iniciar o servidor. O adaptador escuta presentes `Rose` e publica eventos JSON em `ws://localhost:3001/live`; `http://localhost:3001/health` mostra o estado da conexão. O browser React já reconecta ao WebSocket automaticamente.
 
-Por padrão, rosas vão para o lado 22. Você pode enviar os usuários selecionados ao lado 22 com `SIDE_22_USERS=nome1,nome2`; rosas de outros usuários serão atribuídas ao lado 13. Configure essa regra de acordo com a dinâmica da sua live. No PowerShell:
+O x1 inicia com Erika Hilton (esquerda) e Nikolas Ferreira (direita). Use os menus nas cartas para escolher entre os nomes cadastrados em cada espectro. A troca de qualquer candidato reinicia o placar da rodada para não atribuir apoios antigos ao novo nome. Cada Rosa vira um apoio no placar da live; o número eleitoral informado aparece separado como referência.
+
+Na live, cada espectador pode escrever `ESQUERDA` ou `DIREITA` no chat antes de enviar a Rosa. A escolha fica vinculada ao usuário e vale para os próximos presentes. Sem comando prévio, a Rosa vai para a esquerda. Se quiser fixar lados para usuários específicos, `SIDE_LEFT_USERS` e `SIDE_RIGHT_USERS` têm prioridade sobre o comando do chat. No PowerShell:
 
 ```powershell
 $env:TIKTOK_USERNAME = "seu_usuario"
-$env:SIDE_22_USERS = "usuario_azul1,usuario_azul2"
+$env:SIDE_LEFT_USERS = "usuario_esquerda1,usuario_esquerda2"
 npm run server
 ```
 
-O servidor filtra rosas pelo nome do presente e trata sequências de presentes sem contar atualizações intermediárias duas vezes. Cada evento enviado tem `type`, `side`, `quantity`, `username`, `giftName`, `giftId` e `timestamp`.
+O servidor filtra rosas pelo nome do presente e trata sequências de presentes sem contar atualizações intermediárias duas vezes. Cada evento enviado tem `type`, `side` (`left` ou `right`), `quantity`, `username`, `giftName`, `giftId` e `timestamp`.
 
 > `tiktok-live-connector` é uma integração de terceiros não oficial. Eventos e disponibilidade podem mudar; mantenha credenciais e conexão no backend. O navegador se conecta a `ws://localhost:3001/live` sem expor a conexão do TikTok.
 

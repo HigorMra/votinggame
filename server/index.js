@@ -5,12 +5,19 @@ import { TikTokLiveConnection, WebcastEvent } from 'tiktok-live-connector'
 
 const PORT = Number(process.env.PORT) || 3001
 const username = process.env.TIKTOK_USERNAME?.trim().replace(/^@/, '')
-const side22Users = new Set(
-  (process.env.SIDE_22_USERS || '')
+const sideLeftUsers = new Set(
+  (process.env.SIDE_LEFT_USERS || '')
     .split(',')
     .map((name) => name.trim().replace(/^@/, '').toLowerCase())
     .filter(Boolean),
 )
+const sideRightUsers = new Set(
+  (process.env.SIDE_RIGHT_USERS || '')
+    .split(',')
+    .map((name) => name.trim().replace(/^@/, '').toLowerCase())
+    .filter(Boolean),
+)
+const viewerSideChoices = new Map()
 
 const app = express()
 const httpServer = createServer(app)
@@ -95,6 +102,18 @@ if (!username) {
   // credentials are sent to the browser.
   connection = new TikTokLiveConnection(username, { enableExtendedGiftInfo: true })
 
+  connection.on(WebcastEvent.CHAT, (event) => {
+    const sender = (event.user?.uniqueId || '').replace(/^@/, '').toLowerCase()
+    const command = (event.comment || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    if (!sender || !['esquerda', 'direita'].includes(command)) return
+
+    const side = command === 'esquerda' ? 'left' : 'right'
+    viewerSideChoices.delete(sender)
+    viewerSideChoices.set(sender, side)
+    if (viewerSideChoices.size > 5000) viewerSideChoices.delete(viewerSideChoices.keys().next().value)
+    broadcast({ type: 'side-choice', side, username: event.user?.nickname || sender, timestamp: Date.now() })
+  })
+
   connection.on(WebcastEvent.GIFT, (event) => {
     const giftName = event.giftDetails?.giftName
       || event.extendedGiftInfo?.name
@@ -111,9 +130,14 @@ if (!username) {
     const sender = (event.user?.uniqueId || '').replace(/^@/, '')
     const nickname = event.user?.nickname || sender || 'Alguém'
     const quantity = Math.min(1000, Math.max(1, Number(event.repeatCount) || 1))
-    // Configure SIDE_22_USERS to assign named gifters to 22. Other gifters vote 13.
-    // With no assignment list, Roses default to side 22 for a useful first-run demo.
-    const side = side22Users.size === 0 || side22Users.has(sender.toLowerCase()) ? '22' : '13'
+    // Explicit username assignment wins; otherwise use the side the viewer chose in chat.
+    // A viewer without a prior choice defaults to the left side.
+    const senderKey = sender.toLowerCase()
+    const side = sideLeftUsers.has(senderKey)
+      ? 'left'
+      : sideRightUsers.has(senderKey)
+        ? 'right'
+        : viewerSideChoices.get(senderKey) || 'left'
 
     broadcast({
       type: 'rose',
