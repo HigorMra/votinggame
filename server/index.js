@@ -2,6 +2,7 @@ import express from 'express'
 import { createServer } from 'node:http'
 import { WebSocketServer, WebSocket } from 'ws'
 import { TikTokLiveConnection, WebcastEvent } from 'tiktok-live-connector'
+import { readRoseGift, readSideChoice } from './gifts.js'
 
 const PORT = Number(process.env.PORT) || 3001
 const username = process.env.TIKTOK_USERNAME?.trim().replace(/^@/, '')
@@ -17,11 +18,31 @@ const sideRightUsers = new Set(
     .map((name) => name.trim().replace(/^@/, '').toLowerCase())
     .filter(Boolean),
 )
+const allowedOrigins = new Set(
+  (process.env.ALLOWED_ORIGINS || [
+    'https://prismatic-chaja-b3562e.netlify.app',
+    'https://voto-live-overlay.onrender.com',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+  ].join(','))
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+)
 const viewerSideChoices = new Map()
 
 const app = express()
+app.disable('x-powered-by')
 const httpServer = createServer(app)
-const wss = new WebSocketServer({ server: httpServer, path: '/live' })
+const wss = new WebSocketServer({
+  server: httpServer,
+  path: '/live',
+  maxPayload: 1024,
+  verifyClient: ({ origin }, callback) => {
+    const allowed = Boolean(origin && allowedOrigins.has(origin))
+    callback(allowed, allowed ? undefined : 403, allowed ? undefined : 'Origin not allowed')
+  },
+})
 let connection
 let liveStatus = username ? 'connecting' : 'disconnected'
 let shuttingDown = false
@@ -77,10 +98,16 @@ async function connectTikTok() {
 // A small health endpoint makes it easy to tell whether the HTTP/WebSocket adapter
 // is running and whether it has connected to the configured TikTok LIVE room.
 app.get('/health', (_request, response) => {
-  response.json({ service: 'voto-live-adapter', status: liveStatus, streamer: username || null })
+  response.set('Cache-Control', 'no-store')
+  response.set('X-Content-Type-Options', 'nosniff')
+  response.json({ service: 'voto-live-adapter', status: liveStatus })
 })
 
 wss.on('connection', (socket) => {
+  if (wss.clients.size > 100) {
+    socket.close(1013, 'Connection limit reached')
+    return
+  }
   socket.send(JSON.stringify({ type: 'status', status: liveStatus }))
   socket.on('message', (data) => {
     try {
@@ -103,51 +130,18 @@ if (!username) {
   connection = new TikTokLiveConnection(username, { enableExtendedGiftInfo: true })
 
   connection.on(WebcastEvent.CHAT, (event) => {
-    const sender = (event.user?.uniqueId || '').replace(/^@/, '').toLowerCase()
-    const command = (event.comment || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-    if (!sender || !['esquerda', 'direita'].includes(command)) return
+    const choice = readSideChoice(event)
+    if (!choice) return
 
-    const side = command === 'esquerda' ? 'left' : 'right'
-    viewerSideChoices.delete(sender)
-    viewerSideChoices.set(sender, side)
+    viewerSideChoices.delete(choice.sender)
+    viewerSideChoices.set(choice.sender, choice.side)
     if (viewerSideChoices.size > 5000) viewerSideChoices.delete(viewerSideChoices.keys().next().value)
-    broadcast({ type: 'side-choice', side, username: event.user?.nickname || sender, timestamp: Date.now() })
+    broadcast({ type: 'side-choice', side: choice.side, username: choice.username, timestamp: Date.now() })
   })
 
   connection.on(WebcastEvent.GIFT, (event) => {
-    const giftName = event.giftDetails?.giftName
-      || event.extendedGiftInfo?.name
-      || event.giftName
-      || ''
-
-    if (giftName.toLocaleLowerCase() !== 'rose') return
-
-    // Streak gifts emit multiple updates with increasing repeatCount. Count once,
-    // when the streak ends, using its final repeatCount. Ordinary gifts are counted
-    // as soon as their event arrives.
-    if (event.giftDetails?.giftType === 1 && !event.repeatEnd) return
-
-    const sender = (event.user?.uniqueId || '').replace(/^@/, '')
-    const nickname = event.user?.nickname || sender || 'Alguém'
-    const quantity = Math.min(1000, Math.max(1, Number(event.repeatCount) || 1))
-    // Explicit username assignment wins; otherwise use the side the viewer chose in chat.
-    // A viewer without a prior choice defaults to the left side.
-    const senderKey = sender.toLowerCase()
-    const side = sideLeftUsers.has(senderKey)
-      ? 'left'
-      : sideRightUsers.has(senderKey)
-        ? 'right'
-        : viewerSideChoices.get(senderKey) || 'left'
-
-    broadcast({
-      type: 'rose',
-      side,
-      quantity,
-      username: nickname,
-      giftName: 'Rose',
-      giftId: event.giftId,
-      timestamp: Date.now(),
-    })
+    const rose = readRoseGift(event, { sideLeftUsers, sideRightUsers, viewerSideChoices })
+    if (rose) broadcast({ type: 'rose', ...rose })
   })
 
   connection.on('connected', () => {

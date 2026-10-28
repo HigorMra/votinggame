@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Activity, ArrowDownRight, ArrowRight, ChevronDown, ChevronUp, CircleHelp, Clock3, Gift, Heart, Keyboard, Plus, Radio, RotateCcw, Settings2, Sparkles, Users, Wifi, WifiOff, X } from 'lucide-react'
 import { connectLive } from './live.js'
+import { getVoteDelta } from './vote-math.js'
 import './matchup.css'
 import './theme-light.css'
 
@@ -203,10 +204,10 @@ function App() {
 
   const addVote = useCallback((side, quantity = 1, username = 'Teste local') => {
     if (!SIDE_META[side]) return
-    const safeQuantity = Math.min(1000, Math.max(1, Number(quantity) || 1))
-    setScores((current) => ({ ...current, [side]: current[side] + safeQuantity }))
-    setGifts((current) => ({ ...current, [side]: current[side] + 1 }))
-    setVoteTotal((current) => current + safeQuantity)
+    const delta = getVoteDelta(quantity)
+    setScores((current) => ({ ...current, [side]: current[side] + delta.points }))
+    setGifts((current) => ({ ...current, [side]: current[side] + delta.roses }))
+    setVoteTotal((current) => current + delta.total)
     setPressedSide(side)
     window.clearTimeout(resetTimer.current)
     resetTimer.current = window.setTimeout(() => setPressedSide((current) => current === side ? null : current), 720)
