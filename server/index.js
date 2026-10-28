@@ -18,6 +18,9 @@ const wss = new WebSocketServer({ server: httpServer, path: '/live' })
 let connection
 let liveStatus = username ? 'connecting' : 'disconnected'
 let shuttingDown = false
+let connectInFlight = false
+let retryTimer
+let retryDelayMs = 20_000
 
 function broadcast(payload) {
   const message = JSON.stringify(payload)
@@ -30,6 +33,38 @@ function setLiveStatus(status, message) {
   liveStatus = status
   broadcast({ type: 'status', status, ...(message ? { message } : {}) })
   console.log(`[tiktok] ${status}${message ? `: ${message}` : ''}`)
+}
+
+function scheduleReconnect(message) {
+  setLiveStatus('disconnected', message)
+  if (shuttingDown || retryTimer) return
+
+  const delay = retryDelayMs
+  retryDelayMs = Math.min(retryDelayMs * 2, 120_000)
+  console.log(`[tiktok] retrying in ${Math.round(delay / 1000)} seconds`)
+  retryTimer = setTimeout(() => {
+    retryTimer = undefined
+    void connectTikTok()
+  }, delay)
+}
+
+async function connectTikTok() {
+  if (!connection || shuttingDown || connectInFlight || connection.isConnected) return
+  connectInFlight = true
+  setLiveStatus('connecting')
+
+  try {
+    await connection.connect()
+    clearTimeout(retryTimer)
+    retryTimer = undefined
+    retryDelayMs = 20_000
+    setLiveStatus('connected')
+  } catch (error) {
+    console.error('[tiktok] unable to connect:', error?.message || 'Could not connect to LIVE room')
+    scheduleReconnect(error?.message || 'Could not connect to LIVE room')
+  } finally {
+    connectInFlight = false
+  }
 }
 
 // A small health endpoint makes it easy to tell whether the HTTP/WebSocket adapter
@@ -91,19 +126,20 @@ if (!username) {
     })
   })
 
-  connection.on('connected', () => setLiveStatus('connected'))
-  connection.on('disconnected', () => setLiveStatus('disconnected'))
+  connection.on('connected', () => {
+    clearTimeout(retryTimer)
+    retryTimer = undefined
+    retryDelayMs = 20_000
+    setLiveStatus('connected')
+  })
+  connection.on('disconnected', (event) => {
+    scheduleReconnect(event?.reason || 'TikTok LIVE disconnected')
+  })
   connection.on('error', (error) => {
-    console.error('[tiktok] connection error:', error?.message || error)
-    setLiveStatus('disconnected', 'TikTok connection error')
+    console.error('[tiktok] connection error:', error?.message || 'TikTok connection error')
   })
 
-  connection.connect()
-    .then(() => setLiveStatus('connected'))
-    .catch((error) => {
-      console.error('[tiktok] unable to connect:', error.message)
-      setLiveStatus('disconnected', error.message)
-    })
+  void connectTikTok()
 }
 
 httpServer.listen(PORT, '0.0.0.0', () => {
@@ -114,6 +150,7 @@ httpServer.listen(PORT, '0.0.0.0', () => {
 async function shutdown(signal) {
   if (shuttingDown) return
   shuttingDown = true
+  clearTimeout(retryTimer)
   console.log(`[server] ${signal}; closing connections...`)
 
   try {
