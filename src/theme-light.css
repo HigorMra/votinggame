@@ -1,26 +1,27 @@
-:root{font-size:14px;color:#263244;background:#edf2f7}
-body{min-width:320px;background:#edf2f7;color:#263244}
-.app-shell{background:radial-gradient(ellipse at 50% 12%,#ffffffcc,transparent 43%),linear-gradient(180deg,#f6f8fb 0%,#edf2f7 58%,#e8eef5 100%)}
-.ambient-glow{opacity:.055}
+:root{font-size:14px;color:#263244;background:#0c1a2b}
+body{min-width:320px;background:#0c1a2b;color:#263244}
+.app-shell{background:radial-gradient(ellipse at 50% 14%,#1b355144,transparent 42%),linear-gradient(180deg,#0c1a2b 0%,#102139 60%,#0b1727 100%)}
+.ambient-glow{opacity:.09}
 .glow-one{background:#3488d5}.glow-two{background:#db6a73}
-.topbar{background:rgba(249,251,253,.95);border-bottom-color:#dbe3ed}
-.brand{color:#243247}.brand-light{color:#68778b}
+.topbar{background:rgba(10,23,39,.94);border-bottom-color:#26384e}
+.brand{color:#f2f6fb}.brand-light{color:#aab9cb}
 .brand-icon{background:#26384d}.brand-icon span{background:#f3f7fc}
-.brand-divider,.header-separator{background:#d3dce7}.brand-edition{color:#7f8ca0}
+.brand-divider,.header-separator{background:#35475e}.brand-edition{color:#9aacc2}
 .live-indicator{color:#c85160}.live-indicator i,.status-live i{background:#d65e6b;box-shadow:0 0 8px #d65e6b45}
-.header-event{color:#536277}.header-event svg,.timer-label svg{color:#73859d}
+.header-event{color:#bdcad9}.header-event svg,.timer-label svg{color:#a2b4ca}
 .help-button,.icon-button{color:#637188}
 .help-button:hover,.icon-button:hover{color:#263244;background:#e9eef5;border-color:#d4deea}
+.topbar .help-button{color:#c1cede}.topbar .help-button:hover{color:#fff;background:#1b2a3e;border-color:#354961}
 .connect-button{background:#fff;border-color:#cbd6e3;color:#33445b}
 .connect-button:hover{border-color:#96a9c1;background:#f5f8fc}
 .connect-button.is-connected{border-color:#9acbb0;color:#26754a;background:#edf8f1}
 .connect-indicator{background:#8797aa}.is-connected .connect-indicator{background:#3d9b64;box-shadow:0 0 7px #3d9b644d}
-.event-overline{color:#74849a}.event-overline span:first-child,.event-overline span:last-child{background:#bfcbd9}
-.event-overline span:first-child{background:linear-gradient(90deg,transparent,#aebdd0)}.event-overline span:last-child{background:linear-gradient(90deg,#aebdd0,transparent)}
-.match-info h1{color:#243247}.match-info h1 span{color:#4e79aa}
-.match-info p{color:#5d6d82}.match-info p b{color:#a64150}
+.event-overline{color:#b7c5d7}.event-overline span:first-child,.event-overline span:last-child{background:#425774}
+.event-overline span:first-child{background:linear-gradient(90deg,transparent,#607b9b)}.event-overline span:last-child{background:linear-gradient(90deg,#607b9b,transparent)}
+.match-info h1{color:#f0f4fa}.match-info h1 span{color:#8fbce7}
+.match-info p{color:#c2cede}.match-info p b{color:#f0a0a9}
 .panel{border-color:#d8e1eb;background:linear-gradient(145deg,#fff,#f8fafc);box-shadow:0 8px 26px #42556d12}
-.status-panel{border-color:#d8e1eb}.timer-block{border-right-color:#e0e6ed}
+.status-panel{border-color:#d2deea;background:linear-gradient(145deg,#f7faff,#eaf1f8)}.timer-block{border-right-color:#dce5ef}
 .timer-label,.status-metric>span,.difference-metric>span{color:#65758b}
 .timer-block>strong{color:#26364c}.timer-block>.timer-hint{color:#8794a6}
 .timer-urgent{color:#c94d5a!important}
@@ -29,7 +30,7 @@ body{min-width:320px;background:#edf2f7;color:#263244}
 .difference-metric>span svg{color:#3f7dbb}.difference-metric>strong{color:#3377ba}.difference-metric>strong.diff-red{color:#c64f5c}
 .difference-metric>small b{color:#687992}
 .status-live{color:#78869a}
-.candidate-card{border-color:#d8e1eb;background:linear-gradient(145deg,#fff,#f8fafc);box-shadow:0 8px 25px #42556d12}
+.candidate-card{border-color:#d2deea;background:linear-gradient(145deg,#f7faff,#eaf1f8);box-shadow:0 8px 25px #020b172b}
 .candidate-card:before{opacity:.8}.card-blue:before{background:linear-gradient(90deg,transparent,#65a3dc,transparent)}.card-red:before{background:linear-gradient(90deg,transparent,#d97980,transparent)}
 .card-blue .card-glow{background:#7cb6e6}.card-red .card-glow{background:#e9a2a5}
 .candidate-mark{background:#e9f2fb;border-color:#cbdff2;color:#3d78ac}
@@ -37,6 +38,7 @@ body{min-width:320px;background:#edf2f7;color:#263244}
 .candidate-mark>div{border-color:#fff;background:#d8e8f7;color:#32658f}
 .mark-red>div{background:#f3dfe0;color:#a9434d}
 .candidate-tag,.micro-label{color:#75849a}
+.candidate-card .score-row .micro-label{color:#53647a}
 .candidate-label h2{color:#26364b}
 .candidate-party{color:#53647a}
 .candidate-party>span{background:#4386c1;box-shadow:0 0 7px #4386c138}
@@ -71,14 +73,14 @@ body{min-width:320px;background:#edf2f7;color:#263244}
 .card-footer svg{color:#75869d}.card-footer>span:last-child{color:#78869a}.card-footer>span:last-child b{color:#4b5c72}
 .versus>span{background:#fff;border-color:#d0d9e4;color:#52637a;box-shadow:0 3px 10px #34465b20}
 .versus>div{background:linear-gradient(transparent,#c4ceda,transparent)}.versus>small{color:#77869b}
-.activity-strip{background:#fff;border-color:#d8e1eb;box-shadow:0 6px 18px #42556d0d}
+.activity-strip{background:linear-gradient(145deg,#f7faff,#eaf1f8);border-color:#d2deea;box-shadow:0 6px 18px #020b171f}
 .activity-icon{color:#58708c;background:#f0f4f8;border-color:#d8e1eb}
 .activity-title strong{color:#41536b}.activity-title small{color:#7d8b9e}
 .activity-items{border-left-color:#e0e6ed}.activity-user b{color:#3c4d63}.activity-user small{color:#7d8b9e}
 .empty-activity{color:#79879a}.activity-time{color:#8290a2}
 .event-vote{color:#467ead}.vote-label-red{color:#b34e58}
 .activity-rules{color:#60718a}.activity-rules small{color:#8693a4}
-.site-footer{color:#78869a}.footer-dot{color:#8b98a9}.footer-powered>span:first-child{background:#45a872}
+.site-footer{color:#aebdd0}.footer-dot{color:#7288a3}.footer-powered>span:first-child{background:#45a872}
 .control-toggle{background:#fff;border-color:#d1dbe6;box-shadow:0 8px 24px #34465b1c;color:#3b4d64}
 .control-toggle:hover{background:#f3f7fb;border-color:#aebed0}.control-toggle>svg:first-child{color:#637c9b}
 .control-panel{border-color:#d3dde8;box-shadow:0 14px 40px #34465b24}

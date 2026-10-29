@@ -3,8 +3,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Activity, ArrowDownRight, ArrowRight, ChevronDown, ChevronUp, CircleHelp, Clock3, Gift, Heart, Keyboard, Pause, Play, Plus, Radio, RotateCcw, Settings2, Sparkles, Users, Volume2, VolumeX, Wifi, WifiOff, X } from 'lucide-react'
 import { connectLive } from './live.js'
 import { getVoteDelta } from './vote-math.js'
-import './matchup.css'
-import './theme-light.css'
 
 const SIDE_META = {
   left: { label: 'ESQUERDA', color: 'blue', initial: 'E' },
