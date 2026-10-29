@@ -1,4 +1,4 @@
-# Voto Live
+<!--# Voto Live
 
 Arena interativa de votos para TikTok Live. O painel React funciona de forma independente para testes locais; `server/` oferece um adaptador opcional que conecta `tiktok-live-connector` pelo backend Node, encaminhando apenas presentes Rose para o navegador via WebSocket.
 
@@ -51,3 +51,4 @@ O arquivo `render.yaml` define um serviço web gratuito no Render, com health ch
 ## Usar no TikTok LIVE Studio
 
 Depois que a URL pública do Netlify estiver no ar, adicione uma fonte **Browser / Navegador** à cena e informe `https://prismatic-chaja-b3562e.netlify.app/?audio=1`. Ajuste a largura e a altura conforme o canvas da live e posicione o placar na cena. Habilite o áudio dessa fonte para transmitir o funk. Se autoplay for bloqueado, abra **CONTROLES** na fonte e clique em **ATIVAR FUNK EM LOOP**. A página hospedada se conecta sozinha ao WebSocket do Render. Teste as animações com os botões do painel; uma Rose real só atualizará o placar quando a conta `t.hetaxman` estiver ao vivo e o conector estiver conectado. Isso prepara a fonte e o receptor sem iniciar ou publicar uma transmissão.
+-->
