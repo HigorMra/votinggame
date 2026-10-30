@@ -19,12 +19,10 @@ O conector requer o nome de usuário público do criador que está ao vivo. Conf
 
 O x1 sorteia um candidato de cada espectro ao abrir e gera um novo confronto a cada cinco minutos, sem repetir o mesmo par em rodadas consecutivas. A troca automática zera o placar; não há seletor de candidatos na tela. Cada Rosa vira um apoio no placar, enquanto os votos eleitorais aparecem separados como referência. As 52 fotos são retratos oficiais das candidaturas de 2026 publicados pelo TSE e ficam em `public/candidates/`.
 
-Na live, cada espectador pode escrever `ESQUERDA` ou `DIREITA` no chat antes de enviar a Rosa. A escolha fica vinculada ao usuário e vale para as próximas rosas. Sem comando prévio, a Rosa vai para a esquerda. Os nomes em `SIDE_LEFT_USERS` e `SIDE_RIGHT_USERS` podem ser fixados para um lado e têm prioridade sobre o comando do chat. No PowerShell:
+Na live, cada espectador precisa escrever `ESQUERDA` ou `DIREITA` no chat antes de enviar uma Rosa. O comando não diferencia maiúsculas de minúsculas; a escolha mais recente da pessoa vale para as próximas rosas. Presentes Rose/Rosa só entram no placar depois que o conector recebe o evento de presente e encontra uma escolha explícita daquele usuário. Sem comando, o presente não é atribuído a nenhum lado. Outros presentes são ignorados por enquanto. No PowerShell:
 
 ```powershell
 $env:TIKTOK_USERNAME = "seu_usuario"
-$env:SIDE_LEFT_USERS = "usuario_esquerda1,usuario_esquerda2"
-$env:SIDE_RIGHT_USERS = "usuario_direita1,usuario_direita2"
 npm run server
 ```
 

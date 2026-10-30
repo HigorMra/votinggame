@@ -6,18 +6,6 @@ import { readRoseGift, readSideChoice } from './gifts.js'
 
 const PORT = Number(process.env.PORT) || 3001
 const username = process.env.TIKTOK_USERNAME?.trim().replace(/^@/, '')
-const sideLeftUsers = new Set(
-  (process.env.SIDE_LEFT_USERS || '')
-    .split(',')
-    .map((name) => name.trim().replace(/^@/, '').toLowerCase())
-    .filter(Boolean),
-)
-const sideRightUsers = new Set(
-  (process.env.SIDE_RIGHT_USERS || '')
-    .split(',')
-    .map((name) => name.trim().replace(/^@/, '').toLowerCase())
-    .filter(Boolean),
-)
 const allowedOrigins = new Set(
   (process.env.ALLOWED_ORIGINS || [
     'https://prismatic-chaja-b3562e.netlify.app',
@@ -140,7 +128,7 @@ if (!username) {
   })
 
   connection.on(WebcastEvent.GIFT, (event) => {
-    const rose = readRoseGift(event, { sideLeftUsers, sideRightUsers, viewerSideChoices })
+    const rose = readRoseGift(event, { viewerSideChoices })
     if (rose) broadcast({ type: 'rose', ...rose })
   })
 

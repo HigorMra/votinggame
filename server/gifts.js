@@ -14,7 +14,7 @@ export function readSideChoice(event) {
   }
 }
 
-export function readRoseGift(event, { sideLeftUsers, sideRightUsers, viewerSideChoices }) {
+export function readRoseGift(event, { viewerSideChoices }) {
   const giftName = event.giftDetails?.giftName || event.extendedGiftInfo?.name || event.giftName || ''
   const normalizedGiftName = String(giftName).normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLocaleLowerCase()
   if (!['rose', 'rosa'].includes(normalizedGiftName)) return null
@@ -25,11 +25,12 @@ export function readRoseGift(event, { sideLeftUsers, sideRightUsers, viewerSideC
 
   const sender = String(event.user?.uniqueId || '').replace(/^@/, '').slice(0, 50)
   const senderKey = normalizeUsername(sender)
-  const side = sideLeftUsers.has(senderKey)
-    ? 'left'
-    : sideRightUsers.has(senderKey)
-      ? 'right'
-      : viewerSideChoices.get(senderKey) || 'left'
+  const selectedSide = viewerSideChoices.get(senderKey)
+  const side = selectedSide === 'left' || selectedSide === 'right' ? selectedSide : null
+
+  // Never silently assign a paid gift to the left side when the viewer hasn't
+  // explicitly selected a side in chat.
+  if (side !== 'left' && side !== 'right') return null
 
   return {
     side,
