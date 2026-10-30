@@ -252,3 +252,13 @@ body{min-width:320px;background:#0c1a2b;color:#263244}
   .candidate-office{font-size:12px;font-weight:800;line-height:1.2}
   .status-metric>strong,.difference-metric>strong{font-size:23px;font-weight:900}
 }
+
+/* Candidate portrait and name get more visual room in the LIVE card. */
+.candidate-profile img{max-width:138px;height:158px}
+.candidate-description{margin-top:5px}
+.candidate-description>strong{font-size:clamp(21px,2.5vw,26px)}
+@media(max-width:700px), (max-aspect-ratio:4/5){
+  .candidate-profile img{max-width:120px;height:126px}
+  .candidate-description{margin-top:5px}
+  .candidate-description>strong{font-size:clamp(19px,5.6vw,23px);line-height:1.08}
+}
