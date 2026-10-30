@@ -144,7 +144,7 @@ function SideCard({ side, candidate, score, percent, gifts, pressed, roseEvents 
     <div className="card-glow" />
     <div className="candidate-head">
       <div className={`candidate-label label-${color}`}><strong className="side-name">{meta.label}</strong><span className="candidate-tag">LADO DA DISPUTA</span></div>
-      <div className={`side-share share-${color}`}><strong>{percent}<small>%</small></strong></div>
+      <div className={`side-share share-${color}`}><strong>{percent}<small>%</small></strong><span className="share-label">{meta.label}</span></div>
     </div>
     <div className="card-divider" />
     <div className="score-row"><div><span className="micro-label">VOTOS</span><div className={`score score-${color}`}><ScoreNumber value={score}/></div></div><div className="rose-total"><Gift size={18}/><b>{gifts}</b><span>🌹</span></div></div>
