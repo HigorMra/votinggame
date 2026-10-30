@@ -269,6 +269,10 @@ body{min-width:320px;background:#0c1a2b;color:#263244}
   .match-info h1{font-size:clamp(32px,8.8vw,45px);line-height:1.02}
   .side-share .share-label{font-size:12px;font-weight:900;letter-spacing:.4px}
 }
+@media(max-width:700px), (max-aspect-ratio:4/5){
+  .match-info{padding:6px 12px 6px}
+  .match-info h1{margin:0 0 6px}
+}
 
 /* Use the card header for one centered side + percentage label; reclaim room for portraits. */
 .candidate-head{justify-content:center;min-height:50px}
