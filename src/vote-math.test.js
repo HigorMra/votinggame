@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { getVoteDelta } from './vote-math.js'
 
-test('an urn click counts one point and one rose', () => {
+test('one rose gift maps to one point, one rose, and one round vote', () => {
   assert.deepEqual(getVoteDelta(1), { points: 1, roses: 1, total: 1 })
 })
 
