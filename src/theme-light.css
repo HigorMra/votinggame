@@ -220,3 +220,35 @@ body{min-width:320px;background:#0c1a2b;color:#263244}
   .match-result-card{min-width:min(300px,calc(100vw - 28px));padding:18px 20px}
   .match-result-card>strong{font-size:28px}
 }
+
+/* Stronger typography for the candidate details and live scoreboard. */
+.candidate-label .side-name{font-size:clamp(18px,2vw,23px);font-weight:900;letter-spacing:.3px}
+.candidate-tag{font-weight:800;color:#52647c}
+.candidate-description>strong{font-size:clamp(19px,2.2vw,24px);font-weight:900;color:#15283e}
+.candidate-description .candidate-party{font-size:14px;font-weight:900;color:#304761;letter-spacing:.5px}
+.candidate-office{font-size:13px;font-weight:750;color:#30445c;line-height:1.2}
+.micro-label{font-size:12px;font-weight:900;letter-spacing:.8px;color:#354b65}
+.score{font-size:46px;font-weight:900;letter-spacing:-1.6px}
+.rose-total{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:900;color:#334c68}
+.rose-total b{font-size:28px;font-weight:900;color:#243d5a}
+.rose-total svg{width:20px;height:20px;color:#c45161}
+.side-share strong{font-size:30px;font-weight:900}
+.side-share strong small{font-size:16px;font-weight:900}
+.status-metric>strong,.difference-metric>strong{font-weight:900}
+@media(max-width:700px), (max-aspect-ratio:4/5){
+  .candidate-label .side-name{font-size:19px;font-weight:900}
+  .candidate-tag{font-size:10px;font-weight:850}
+  .side-share strong{font-size:29px;font-weight:900}
+  .side-share strong small{font-size:16px}
+  .score{font-size:43px;font-weight:900}
+  .micro-label{font-size:12px;font-weight:900}
+  .rose-total{gap:6px;font-size:17px;font-weight:900}
+  .rose-total b{font-size:25px}
+  .rose-total svg{width:19px;height:19px}
+  .candidate-profile{max-width:48%;padding:7px 6px}
+  .candidate-profile img{height:110px}
+  .candidate-description>strong{font-size:clamp(17px,5vw,21px);font-weight:900;line-height:1.08}
+  .candidate-description .candidate-party{font-size:13px;font-weight:900}
+  .candidate-office{font-size:12px;font-weight:800;line-height:1.2}
+  .status-metric>strong,.difference-metric>strong{font-size:23px;font-weight:900}
+}
