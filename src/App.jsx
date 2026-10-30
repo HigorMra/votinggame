@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Activity, ArrowDownRight, ArrowRight, ChevronDown, ChevronUp, CircleHelp, Clock3, Gift, Heart, Keyboard, Pause, Play, Plus, Radio, RotateCcw, Settings2, Sparkles, Users, Volume2, VolumeX, Wifi, WifiOff, X } from 'lucide-react'
+import { Activity, ArrowDownRight, ArrowRight, Clock3, Gift, Heart, Radio, Sparkles, Users } from 'lucide-react'
 import { connectLive } from './live.js'
 import { getVoteDelta } from './vote-math.js'
 
@@ -71,7 +71,6 @@ const CANDIDATES = {
 const initialScores = { left: 0, right: 0 }
 const initialGifts = { left: 0, right: 0 }
 const MATCH_DURATION = 5 * 60
-const DEFAULT_LIVE_USERNAME = 'supremacia0777'
 const autoConnectOnLoad = import.meta.env.VITE_AUTO_CONNECT === 'true'
 const autoPlayMusic = new URLSearchParams(window.location.search).get('audio') === '1'
 
@@ -106,14 +105,14 @@ function Panel({ children, className = '' }) {
   return <div className={`panel ${className}`}>{children}</div>
 }
 
-function VotingMachine({ side, candidate, pressed, onVote }) {
+function VotingMachine({ side, candidate, pressed }) {
   const meta = SIDE_META[side]
   const color = meta.color
   const [lastPress, setLastPress] = useState(0)
 
   useEffect(() => { if (pressed) setLastPress(Date.now()) }, [pressed])
 
-  return <button type="button" className="machine-vote-button" onClick={onVote} title={`Simular apoio a ${candidate.name}`} aria-label={`Simular um apoio local a ${candidate.name}; isso não envia um presente ao TikTok`}><div className={`machine machine-${color} ${pressed ? 'machine-pressed' : ''}`}>
+  return <div className="machine-visual" aria-hidden="true"><div className={`machine machine-${color} ${pressed ? 'machine-pressed' : ''}`}>
     <div className="machine-top"><span className="machine-brand">VOTO LIVE · X1</span><span className="machine-indicator"><i /> LIGADA</span></div>
     <div className="machine-screen-wrap">
       <div className="machine-screen">
@@ -129,7 +128,7 @@ function VotingMachine({ side, candidate, pressed, onVote }) {
     </div>
     <motion.div key={lastPress} className="machine-finger" initial={{ x: 0, y: 0, opacity: 0 }} animate={pressed ? { x: -35, y: -25, opacity: [0, 1, 1, 0] } : { opacity: 0 }} transition={{ duration: .52, times: [0, .2, .65, 1] }}>👆🏻</motion.div>
     <div className="machine-base" />
-  </div></button>
+  </div></div>
 }
 
 function RoseFly({ side, username }) {
@@ -137,36 +136,22 @@ function RoseFly({ side, username }) {
   return <motion.div className={`rose-fly rose-${color}`} initial={{ opacity: 0, x: 0, y: 16, scale: .25, rotate: -25 }} animate={{ opacity: [0, 1, 1, 0], x: [0, 22, 82, 130], y: [16, -35, -42, -18], scale: [.3, 1.18, 1, .65], rotate: [-25, 5, 18, 32] }} exit={{ opacity: 0 }} transition={{ duration: 1.2, ease: 'easeOut' }}><span>🌹</span><small>{username || 'Rosa'}</small><Sparkles size={13}/></motion.div>
 }
 
-function SideCard({ side, candidate, score, total, percent, gifts, pressed, roseEvents, onVote }) {
+function SideCard({ side, candidate, score, percent, gifts, pressed, roseEvents }) {
   const meta = SIDE_META[side]
   const color = meta.color
 
   return <Panel className={`candidate-card card-${color}`}>
     <div className="card-glow" />
     <div className="candidate-head">
-      <div className={`candidate-mark mark-${color}`}><span>{meta.initial}</span></div>
-      <div className="candidate-label"><span className="candidate-tag">ESPECTRO · {meta.label}</span><strong className="match-lock">X1 ALEATÓRIO</strong></div>
-      <div className={`side-share share-${color}`}><strong>{percent}<small>%</small></strong><span>DA LIVE</span></div>
+      <div className={`candidate-label label-${color}`}><strong className="side-name">{meta.label}</strong><span className="candidate-tag">LADO DA DISPUTA</span></div>
+      <div className={`side-share share-${color}`}><strong>{percent}<small>%</small></strong></div>
     </div>
     <div className="card-divider" />
-    <div className="score-row"><div><span className="micro-label">APOIOS NA RODADA</span><div className={`score score-${color}`}><ScoreNumber value={score}/><span className="score-unit">votos</span></div></div><div className="total-voter-pill"><Users size={13}/><span>{scoreFormat(total)} <b>na rodada</b></span></div></div>
+    <div className="score-row"><div><span className="micro-label">VOTOS</span><div className={`score score-${color}`}><ScoreNumber value={score}/></div></div><div className="rose-total"><Gift size={18}/><b>{gifts}</b><span>🌹</span></div></div>
     <div className="vote-progress"><div className={`progress-fill fill-${color}`} style={{ width: `${percent}%` }} /><span className={`progress-marker marker-dot-${color}`} style={{ left: `calc(${percent}% - 5px)` }} /></div>
-    <div className="machine-holder"><div className="machine-caption"><span><Activity size={12}/> TOQUE PARA SIMULAR APOIO</span><span className="machine-status"><i/> {meta.label}</span></div><div className="machine-stage"><div className="candidate-profile"><img src={candidate.photo} alt={`Foto oficial de ${candidate.name}, ${candidate.party}`} loading="eager"/><div className="candidate-description"><strong>{candidate.name}</strong><span className="candidate-party"><span />{candidate.party}</span><span className="candidate-office">{candidate.office}</span><small>{scoreFormat(candidate.votes)} VOTOS INFORMADOS</small></div></div><VotingMachine side={side} candidate={candidate} pressed={pressed} onVote={onVote}/></div><AnimatePresence>{roseEvents.map((event) => <RoseFly key={event.id} side={side} username={event.username}/>)}</AnimatePresence></div>
-    <div className="card-footer"><span><Gift size={13}/>{gifts} rosas recebidas</span><span>ROSE <b>×1 APOIO</b></span></div>
+    <div className="machine-holder"><div className="machine-caption"><span>URNA {meta.label}</span><span className="machine-status"><i/> AO VIVO</span></div><div className="machine-stage"><div className="candidate-profile"><img src={candidate.photo} alt={`Foto oficial de ${candidate.name}, ${candidate.party}`} loading="eager"/><div className="candidate-description"><strong>{candidate.name}</strong><span className="candidate-party"><span />{candidate.party}</span><span className="candidate-office">{candidate.office}</span></div></div><VotingMachine side={side} candidate={candidate} pressed={pressed}/></div><AnimatePresence>{roseEvents.map((event) => <RoseFly key={event.id} side={side} username={event.username}/>)}</AnimatePresence></div>
+    <div className="card-footer"><span><Gift size={16}/>{gifts} ROSAS</span><span>1 ROSA = 1 VOTO</span></div>
   </Panel>
-}
-
-function FloatingControls({ open, setOpen, onVote, onReset, scores, liveStatus, selectedCandidates, round, audioPlaying, onToggleAudio, audioVolume, onAudioVolumeChange, audioError }) {
-  return <>
-    <motion.button className="control-toggle" onClick={() => setOpen(!open)} whileTap={{ scale: .94 }} aria-label="Abrir painel de controle"><Settings2 size={16}/><span>CONTROLES</span>{open ? <ChevronDown size={14}/> : <ChevronUp size={14}/>}</motion.button>
-    <AnimatePresence>{open && <motion.div className="control-panel panel" initial={{ opacity: 0, y: 22, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: .97 }} transition={{ duration: .2 }}>
-      <div className="control-heading"><div className="control-heading-icon"><Keyboard size={16}/></div><div><strong>PAINEL DO CRIADOR</strong><span>Rodada {round} · o x1 troca a cada 5 minutos</span></div><button className="icon-button control-close" onClick={() => setOpen(false)} aria-label="Fechar controles"><X size={16}/></button></div>
-      <div className="control-buttons"><button className="manual-vote vote-blue" onClick={() => onVote('left')}><Plus size={17}/><span><b>+1 Rosa · {selectedCandidates.left.name}</b><small>Simular apoio na esquerda</small></span><span className="manual-number">E</span></button><button className="manual-vote vote-red" onClick={() => onVote('right')}><Plus size={17}/><span><b>+1 Rosa · {selectedCandidates.right.name}</b><small>Simular apoio na direita</small></span><span className="manual-number">D</span></button></div>
-      <div className="audio-controls"><button className="audio-toggle" onClick={onToggleAudio} aria-pressed={audioPlaying}>{audioPlaying ? <Pause size={15}/> : <Play size={15}/>}<span><b>{audioPlaying ? 'PAUSAR SOM' : 'ATIVAR FUNK EM LOOP'}</b><small>Funk da urna eletrônica 2026</small></span>{audioPlaying ? <Volume2 size={16}/> : <VolumeX size={16}/>}</button><label className="audio-volume"><span>VOLUME</span><input type="range" min="0" max="1" step="0.05" value={audioVolume} onChange={(event) => onAudioVolumeChange(Number(event.target.value))} aria-label="Volume do funk"/><b>{Math.round(audioVolume * 100)}%</b></label>{audioError && <small className="audio-error">Não foi possível iniciar o áudio. Tente ativar novamente.</small>}</div>
-      <div className="control-bottom"><span><i className={`status-dot ${liveStatus === 'connected' ? 'dot-live' : ''}`}/>{liveStatus === 'connected' ? 'Live conectada' : 'Aguardando TikTok LIVE'}</span><button onClick={onReset}><RotateCcw size={12}/> REINICIAR PLACAR</button></div>
-      <div className="control-footnote">PLACAR ATUAL <b>{scoreFormat(scores.left)}</b><span>—</span><b>{scoreFormat(scores.right)}</b></div>
-    </motion.div>}</AnimatePresence>
-  </>
 }
 
 function App() {
@@ -175,21 +160,11 @@ function App() {
   const [matchup, setMatchup] = useState(() => randomMatchup())
   const [round, setRound] = useState(1)
   const [elapsed, setElapsed] = useState(MATCH_DURATION)
-  const [paused, setPaused] = useState(false)
   const [voteTotal, setVoteTotal] = useState(0)
   const [pressedSide, setPressedSide] = useState(null)
   const [roseEvents, setRoseEvents] = useState({ left: [], right: [] })
-  const [panelOpen, setPanelOpen] = useState(false)
   const [liveStatus, setLiveStatus] = useState(autoConnectOnLoad ? 'connecting' : 'disconnected')
-  const [liveUsername, setLiveUsername] = useState(autoConnectOnLoad ? DEFAULT_LIVE_USERNAME : '')
-  const [showConnect, setShowConnect] = useState(false)
-  const [inputUsername] = useState(DEFAULT_LIVE_USERNAME)
-  const [connected, setConnected] = useState(autoConnectOnLoad)
-  const [helpOpen, setHelpOpen] = useState(false)
   const [events, setEvents] = useState([])
-  const [audioPlaying, setAudioPlaying] = useState(false)
-  const [audioVolume, setAudioVolume] = useState(0.25)
-  const [audioError, setAudioError] = useState(false)
   const [matchResult, setMatchResult] = useState(null)
   const seq = useRef(0)
   const resetTimer = useRef()
@@ -210,11 +185,11 @@ function App() {
   const leader = difference > 0 ? 'left' : difference < 0 ? 'right' : null
   roundSnapshotRef.current = { scores, round, candidatesBySide }
 
-  const addVote = useCallback((side, quantity = 1, username = 'Teste local', isGift = true) => {
+  const addVote = useCallback((side, quantity = 1, username = 'TikTok') => {
     if (!SIDE_META[side]) return
     const delta = getVoteDelta(quantity)
     setScores((current) => ({ ...current, [side]: current[side] + delta.points }))
-    if (isGift) setGifts((current) => ({ ...current, [side]: current[side] + delta.roses }))
+    setGifts((current) => ({ ...current, [side]: current[side] + delta.roses }))
     setVoteTotal((current) => current + delta.total)
     setPressedSide(side)
     window.clearTimeout(resetTimer.current)
@@ -222,15 +197,11 @@ function App() {
     const id = ++seq.current
     setRoseEvents((current) => ({ ...current, [side]: [...current[side], { id, username }].slice(-5) }))
     setTimeout(() => setRoseEvents((current) => ({ ...current, [side]: current[side].filter((item) => item.id !== id) })), 1400)
-    setEvents((current) => [{ id, side, username, isGift, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }, ...current].slice(0, 5))
+    setEvents((current) => [{ id, side, username, time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }, ...current].slice(0, 5))
   }, [])
 
   const resetScoreboard = () => {
     setScores(initialScores); setGifts(initialGifts); setVoteTotal(0); setEvents([]); setRoseEvents({ left: [], right: [] }); setPressedSide(null)
-  }
-
-  const resetGame = () => {
-    resetScoreboard(); setElapsed(MATCH_DURATION); setPaused(false)
   }
 
   const startNextRound = useCallback(() => {
@@ -242,14 +213,13 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (paused) return undefined
     if (elapsed <= 0) {
       startNextRound()
       return undefined
     }
     const timer = window.setTimeout(() => setElapsed((time) => Math.max(0, time - 1)), 1000)
     return () => window.clearTimeout(timer)
-  }, [paused, elapsed, startNextRound])
+  }, [elapsed, startNextRound])
 
   useEffect(() => {
     if (!matchResult) return undefined
@@ -260,54 +230,18 @@ function App() {
   useEffect(() => () => { window.clearTimeout(resetTimer.current); sourceCleanups.current.forEach((cleanup) => cleanup()) }, [])
 
   useEffect(() => {
-    if (!connected || (!liveUsername && !autoConnectOnLoad)) return undefined
+    if (!autoConnectOnLoad) return undefined
     const timer = window.setTimeout(() => {
       const cleanup = connectLive((event) => addVote(event.side, event.quantity, event.username), setLiveStatus)
       sourceCleanups.current.push(cleanup)
     }, 0)
     return () => window.clearTimeout(timer)
-  }, [connected, liveUsername, addVote])
-
-  const connectToLive = (event) => {
-    event.preventDefault()
-    const username = DEFAULT_LIVE_USERNAME
-    if (!username) return
-    setLiveUsername(username); setConnected(true); setLiveStatus('connecting'); setShowConnect(false)
-  }
-
-  const disconnectLive = () => {
-    sourceCleanups.current.forEach((cleanup) => cleanup())
-    sourceCleanups.current = []
-    setConnected(false); setLiveStatus('disconnected'); setLiveUsername('')
-  }
-
-  const toggleAudio = async () => {
-    const audio = audioRef.current
-    if (!audio) return
-    if (!audio.paused) {
-      audio.pause()
-      setAudioPlaying(false)
-      return
-    }
-    audio.volume = audioVolume
-    setAudioError(false)
-    try {
-      await audio.play()
-      setAudioPlaying(true)
-    } catch {
-      setAudioPlaying(false)
-      setAudioError(true)
-    }
-  }
-
-  useEffect(() => {
-    if (audioRef.current) audioRef.current.volume = audioVolume
-  }, [audioVolume])
+  }, [addVote])
 
   useEffect(() => {
     if (!autoPlayMusic || !audioRef.current) return
-    audioRef.current.volume = audioVolume
-    audioRef.current.play().then(() => setAudioPlaying(true)).catch(() => setAudioError(true))
+    audioRef.current.volume = 0.25
+    audioRef.current.play().catch(() => {})
   }, [])
 
   return <main className="app-shell">
@@ -315,29 +249,24 @@ function App() {
     <header className="topbar">
       <a href="#top" className="brand"><div className="brand-icon"><span/><span/><span/></div><span>VOTO<span className="brand-light">LIVE</span></span><span className="brand-divider"/><span className="brand-edition">X1</span></a>
       <div className="header-center"><span className="live-indicator"><i/> TRANSMISSÃO AO VIVO</span><span className="header-separator"/><span className="header-event"><Radio size={13}/> X1 DE MANDATOS</span></div>
-      <div className="header-actions"><button className="help-button" onClick={() => setHelpOpen(!helpOpen)} aria-label="Ajuda"><CircleHelp size={16}/></button><button className={`connect-button ${connected ? 'is-connected' : ''}`} onClick={() => connected ? disconnectLive() : setShowConnect(true)}><span className="connect-indicator"/>{connected ? liveStatus === 'connected' ? 'LIVE CONECTADA' : 'AGUARDANDO LIVE' : 'CONECTAR TIKTOK'}{connected ? <Wifi size={14}/> : <ArrowRight size={14}/>}</button></div>
+      <div className="header-actions"><span className={`connect-button ${liveStatus === 'connected' ? 'is-connected' : ''} status-${liveStatus}`}><span className="connect-indicator"/>{liveStatus === 'connected' ? 'LIVE CONECTADA' : liveStatus === 'connecting' ? 'CONECTANDO LIVE' : 'LIVE OFFLINE'}</span></div>
     </header>
 
-    <section className="match-info"><div className="event-overline"><span/><span>X1 ALEATÓRIO A CADA 5 MINUTOS</span><span/></div><h1>QUEM FARÁ <span>O MELHOR MANDATO?</span></h1><p>Escreva <b>ESQUERDA</b> ou <b>DIREITA</b> no chat e envie uma <b>Rosa 🌹 pelo TikTok</b> para votar. Clique na urna para simular.</p></section>
+    <section className="match-info"><div className="event-overline"><span/><span>X1 · NOVO MATCH A CADA 5 MIN</span><span/></div><h1>A DECISÃO É SUA:<br/><span>QUEM FARÁ O MELHOR MANDATO?</span></h1><p>COMENTE <b className="instruction-left">ESQUERDA</b> OU <b className="instruction-right">DIREITA</b><br/>ENVIE 🌹 <b>1 ROSA = 1 VOTO</b></p></section>
 
     <section className="scoreboard" aria-label="Placar do x1 de candidatos">
-      <Panel className="status-panel"><button className="timer-block" onClick={() => setPaused(!paused)} title={paused ? 'Retomar rodada' : 'Pausar rodada'}><span className="timer-label"><Clock3 size={12}/>PRÓXIMO X1 EM</span><strong className={elapsed <= 30 ? 'timer-urgent' : ''}>{formatTime(elapsed)}</strong><span className="timer-hint">{paused ? 'PAUSADO · CLIQUE PARA RETOMAR' : `RODADA ${round} · CLIQUE PARA PAUSAR`}</span></button><div className="status-divider"/><div className="status-metric"><span><Users size={13}/>APOIOS DA RODADA</span><strong><ScoreNumber value={voteTotal}/></strong><small>nesta rodada</small></div><div className="status-divider"/><div className="difference-metric"><span>{leader ? <ArrowDownRight size={14}/> : <Activity size={14}/>}DIFERENÇA</span><strong className={leader ? `diff-${SIDE_META[leader].color}` : ''}>{difference === 0 ? '—' : `${difference > 0 ? '+' : ''}${scoreFormat(difference)}`}</strong><small>{leader ? <>VANTAGEM <b>{SIDE_META[leader].label}</b></> : 'TUDO IGUAL'}</small></div><div className="status-live"><i/> RODADA {round}</div></Panel>
-      <div className="candidate-grid"><SideCard side="left" candidate={candidatesBySide.left} score={scores.left} total={voteTotal} percent={percentages.left} gifts={gifts.left} pressed={pressedSide === 'left'} roseEvents={roseEvents.left} onVote={() => addVote('left', 1, 'Demonstração', false)}/><div className="versus"><span>VS</span><div/><small>AO VIVO</small></div><SideCard side="right" candidate={candidatesBySide.right} score={scores.right} total={voteTotal} percent={percentages.right} gifts={gifts.right} pressed={pressedSide === 'right'} roseEvents={roseEvents.right} onVote={() => addVote('right', 1, 'Demonstração', false)}/></div>
+      <Panel className="status-panel"><div className="timer-block"><span className="timer-label"><Clock3 size={12}/>PRÓXIMO X1</span><strong className={elapsed <= 30 ? 'timer-urgent' : ''}>{formatTime(elapsed)}</strong><span className="timer-hint">RODADA {round}</span></div><div className="status-divider"/><div className="status-metric"><span><Users size={13}/>VOTOS</span><strong><ScoreNumber value={voteTotal}/></strong><small>nesta rodada</small></div><div className="status-divider"/><div className="difference-metric"><span>{leader ? <ArrowDownRight size={14}/> : <Activity size={14}/>}DIFERENÇA</span><strong className={leader ? `diff-${SIDE_META[leader].color}` : ''}>{difference === 0 ? '—' : `${difference > 0 ? '+' : ''}${scoreFormat(difference)}`}</strong><small>{leader ? <>VANTAGEM <b>{SIDE_META[leader].label}</b></> : 'TUDO IGUAL'}</small></div><div className="status-live"><i/> RODADA {round}</div></Panel>
+      <div className="candidate-grid"><SideCard side="left" candidate={candidatesBySide.left} score={scores.left} percent={percentages.left} gifts={gifts.left} pressed={pressedSide === 'left'} roseEvents={roseEvents.left}/><div className="versus"><span>VS</span><div/><small>AO VIVO</small></div><SideCard side="right" candidate={candidatesBySide.right} score={scores.right} percent={percentages.right} gifts={gifts.right} pressed={pressedSide === 'right'} roseEvents={roseEvents.right}/></div>
     </section>
 
-    <section className="activity-strip"><div className="activity-title"><span className="activity-icon"><Activity size={14}/></span><div><strong>ÚLTIMOS APOIOS</strong><small>ACOMPANHE O X1</small></div></div><div className="activity-items"><AnimatePresence initial={false}>{events.length ? events.slice(0, 3).map((event) => <motion.div key={event.id} className="activity-item" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -10 }}><span className={`event-avatar avatar-${SIDE_META[event.side].color}`}>{SIDE_META[event.side].initial}</span><span className="activity-user"><b>{event.username}</b><small>{event.isGift ? 'enviou uma Rosa' : 'apoio de demonstração'}</small></span><span className={`event-vote vote-label-${SIDE_META[event.side].color}`}>APOIOU {SIDE_META[event.side].label}</span><span className="activity-time">{event.time}</span></motion.div>) : <span className="empty-activity">Aguardando os primeiros apoios da rodada...</span>}</AnimatePresence></div><div className="activity-rules"><span><span className="rose-mini">🌹</span><b>LADO NO CHAT</b><ArrowRight size={12}/><b>1 ROSA</b></span><small>ESCREVA ESQUERDA OU DIREITA</small></div></section>
+    <section className="activity-strip"><div className="activity-title"><span className="activity-icon"><Activity size={14}/></span><div><strong>ROSAS RECEBIDAS</strong><small>AO VIVO</small></div></div><div className="activity-items"><AnimatePresence initial={false}>{events.length ? events.slice(0, 3).map((event) => <motion.div key={event.id} className="activity-item" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -10 }}><span className={`event-avatar avatar-${SIDE_META[event.side].color}`}>{SIDE_META[event.side].initial}</span><span className="activity-user"><b>{event.username}</b><small>ENVIOU 🌹</small></span><span className={`event-vote vote-label-${SIDE_META[event.side].color}`}>+1 {SIDE_META[event.side].label}</span><span className="activity-time">{event.time}</span></motion.div>) : <span className="empty-activity">AGUARDANDO ROSAS</span>}</AnimatePresence></div><div className="activity-rules"><span><span className="rose-mini">🌹</span><b>CHAT + ROSA</b></span><small>1 ROSA = 1 VOTO</small></div></section>
 
     <footer className="site-footer"><span>© 2026 VOTO LIVE <span className="footer-dot">·</span> FOTOS DE CANDIDATURAS · TSE 2026</span><span className="footer-powered"><span/><span>FEITO PARA A COMUNIDADE</span><Heart size={11}/></span></footer>
 
-      <FloatingControls open={panelOpen} setOpen={setPanelOpen} onVote={(side) => addVote(side, 1, 'Teste local', false)} onReset={resetGame} scores={scores} liveStatus={liveStatus} selectedCandidates={candidatesBySide} round={round} audioPlaying={audioPlaying} onToggleAudio={toggleAudio} audioVolume={audioVolume} onAudioVolumeChange={setAudioVolume} audioError={audioError}/>
-
-      <audio ref={audioRef} src="/audio/funk-da-urna-2026.mp3" loop preload="auto" onPlay={() => { setAudioPlaying(true); setAudioError(false) }} onPause={() => setAudioPlaying(false)} onError={() => { setAudioPlaying(false); setAudioError(true) }} />
+      <audio ref={audioRef} src="/audio/funk-da-urna-2026.mp3" loop preload="auto" />
 
       <AnimatePresence>{matchResult && <motion.div className="match-result-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}><motion.div className={`match-result-card ${matchResult.winnerSide ? `result-${SIDE_META[matchResult.winnerSide].color}` : 'result-tie'}`} initial={{ opacity: 0, y: 24, scale: .82 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: .94 }} transition={{ type: 'spring', damping: 18, stiffness: 220 }} role="status" aria-live="polite"><Sparkles size={23}/><span className="result-kicker">FIM DA RODADA {matchResult.round}</span><strong>{matchResult.winner ? `${matchResult.winner.name} venceu!` : 'Empate!'}</strong><span className="result-score">{scoreFormat(matchResult.scores.left)} × {scoreFormat(matchResult.scores.right)}</span><small>{matchResult.winner ? `VITÓRIA ${SIDE_META[matchResult.winnerSide].label}` : 'A PRÓXIMA DISPUTA COMEÇA AGORA'}</small></motion.div></motion.div>}</AnimatePresence>
 
-    <AnimatePresence>{showConnect && <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(event) => { if (event.target === event.currentTarget) setShowConnect(false) }}><motion.form className="connect-modal panel" onSubmit={connectToLive} initial={{ opacity: 0, y: 15, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: .98 }}><button className="icon-button modal-close" type="button" onClick={() => setShowConnect(false)} aria-label="Fechar"><X size={17}/></button><div className="modal-icon"><Radio size={21}/></div><span className="modal-overline">CONECTAR TRANSMISSÃO</span><h2>Entre na disputa</h2><p>O receptor está configurado para acompanhar a LIVE de @{inputUsername}. Ele não inicia a transmissão.</p><div className="connection-note"><WifiOff size={14}/><span>O adaptador do Render precisa estar conectado e a conta precisa estar ao vivo. Uma Rosa só vira apoio depois que o TikTok a entrega como presente.</span></div><button className="modal-submit" type="submit">CONECTAR LIVE <ArrowRight size={15}/></button><button className="demo-link" type="button" onClick={() => { setShowConnect(false); setPanelOpen(true) }}>Continuar no modo demonstração</button></motion.form></motion.div>}</AnimatePresence>
-
-    <AnimatePresence>{helpOpen && <motion.div className="help-popover panel" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }}><button className="icon-button help-close" onClick={() => setHelpOpen(false)} aria-label="Fechar ajuda"><X size={14}/></button><strong>COMO FUNCIONA</strong><p>Um x1 aleatório começa a cada rodada de cinco minutos. Escreva ESQUERDA ou DIREITA no chat antes de enviar uma Rosa. Você também pode clicar na urna para simular um apoio.</p><div><span>🌹</span> 1 ROSA = 1 APOIO</div></motion.div>}</AnimatePresence>
   </main>
 }
 

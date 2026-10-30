@@ -26,17 +26,17 @@ $env:TIKTOK_USERNAME = "seu_usuario"
 npm run server
 ```
 
-O servidor filtra rosas pelo nome do presente e trata sequências de presentes sem contar atualizações intermediárias duas vezes. Cada evento enviado tem `type`, `side` (`left` ou `right`), `quantity`, `username`, `giftName`, `giftId` e `timestamp`. Clicar em uma urna também anima uma flor e acrescenta um apoio local para demonstrar o efeito.
+O servidor filtra rosas pelo nome do presente e trata sequências de presentes sem contar atualizações intermediárias duas vezes. Cada evento enviado tem `type`, `side` (`left` ou `right`), `quantity`, `username`, `giftName`, `giftId` e `timestamp`. A escolha só é atribuída depois de o espectador comentar `ESQUERDA` ou `DIREITA` e enviar a Rosa; urnas e placar são somente visuais e não aceitam votos por clique.
 
-O arquivo `public/audio/funk-da-urna-2026.mp3` é reproduzido em loop pelo overlay. Para tentar iniciar automaticamente na fonte do LIVE Studio, use a URL com `?audio=1` e habilite o áudio da fonte. Se o navegador bloquear autoplay, abra **CONTROLES**, clique em **ATIVAR FUNK EM LOOP** e ajuste o volume.
+O arquivo `public/audio/funk-da-urna-2026.mp3` pode ser reproduzido em loop pelo overlay. Para tentar iniciar automaticamente na fonte do LIVE Studio, use a URL com `?audio=1` e habilite o áudio da fonte. Alguns navegadores bloqueiam autoplay; confirme o áudio na prévia do LIVE Studio antes da transmissão.
 
 > `tiktok-live-connector` é uma integração de terceiros não oficial. Eventos e disponibilidade podem mudar; mantenha credenciais e conexão no backend. O navegador se conecta a `ws://localhost:3001/live` sem expor a conexão do TikTok.
 
 ## Estrutura
 
-- `src/`: dashboard, placar, urna animada, controles locais e cliente WebSocket.
+- `src/`: overlay, placar, urna animada e cliente WebSocket.
 - `server/index.js`: conexão com TikTok Live, filtro de Rose e retransmissão WebSocket.
-- Sem variáveis de servidor, a interface fica em modo demonstração e os botões do painel atualizam a partida localmente.
+- Sem conexão ao WebSocket do servidor, o placar permanece sem votos até receber presentes válidos.
 
 ## Publicar a interface no Netlify
 
@@ -48,5 +48,5 @@ O arquivo `render.yaml` define um serviço web gratuito no Render, com health ch
 
 ## Usar no TikTok LIVE Studio
 
-Depois que a URL pública do Netlify estiver no ar, adicione uma fonte **Browser / Navegador** à cena e informe `https://prismatic-chaja-b3562e.netlify.app/?audio=1`. Ajuste a largura e a altura conforme o canvas da live e posicione o placar na cena. Habilite o áudio dessa fonte para transmitir o funk. Navegadores podem bloquear reprodução automática; nesse caso, abra **CONTROLES** na fonte e clique em **ATIVAR FUNK EM LOOP**. O clique na urna adiciona somente um voto de demonstração ao placar. O site não pode enviar presentes em nome do espectador: para votar com uma Rosa real, a pessoa precisa enviá-la pela interface do TikTok LIVE. O adaptador acompanha a conta `supremacia0777`; cada Rosa recebida atualiza o placar quando o conector estiver conectado.
+Depois que a URL pública do Netlify estiver no ar, adicione uma fonte **Browser / Navegador** à cena e informe `https://prismatic-chaja-b3562e.netlify.app/?audio=1`. Use canvas vertical, habilite o áudio da fonte e confirme o resultado na prévia. O autoplay pode ser bloqueado pelo navegador. Urnas não registram votos por clique: o espectador comenta `ESQUERDA` ou `DIREITA` e envia uma Rosa pela interface do TikTok LIVE. O adaptador acompanha a conta `supremacia0777`; a Rosa atualiza o placar quando o conector recebe a escolha do chat e o presente.
 -->

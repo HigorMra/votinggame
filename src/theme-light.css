@@ -134,3 +134,89 @@ body{min-width:320px;background:#0c1a2b;color:#263244}
   .machine-status,.activity-rules small,.site-footer{font-size:7px}
   .candidate-description>small{font-size:8px}.candidate-office{font-size:9px}
 }
+
+/* Portrait LIVE overlay: short copy, large vote instruction, legible candidate cards. */
+.machine-visual{display:flex;align-items:center;justify-content:center;flex:none;padding:0;border:0;background:transparent}
+.instruction-left{color:#ff5e6a!important}.instruction-right{color:#ffd84a!important;text-shadow:0 0 12px #4bc980!important}
+.match-info p{font-size:clamp(17px,2.1vw,23px);line-height:1.5;font-weight:800;letter-spacing:.35px}
+.match-info p b{font-weight:900}
+.candidate-description>strong{font-size:clamp(16px,1.9vw,21px)}
+.candidate-office{font-size:12px}
+.micro-label,.candidate-tag,.machine-caption,.card-footer,.activity-rules small{font-size:10px}
+.connect-button{pointer-events:none}
+@media(max-width:700px), (max-aspect-ratio:4/5){
+  .topbar{height:48px;padding:0 14px}
+  .header-center,.header-actions,.brand-divider,.brand-edition,.site-footer{display:none}
+  .brand{font-size:15px}
+  .match-info{padding:14px 12px 12px}
+  .event-overline{font-size:10px;letter-spacing:1px}
+  .match-info h1{font-size:clamp(30px,8.3vw,42px);line-height:1.02;letter-spacing:.2px}
+  .match-info p{margin-top:9px;font-size:clamp(16px,4.4vw,21px);line-height:1.35}
+  .scoreboard{margin:0 10px}
+  .status-panel{height:72px;margin-bottom:8px;padding:8px 6px}
+  .timer-block{width:31%;padding-left:4px}
+  .timer-label{font-size:9px;gap:3px}
+  .timer-label svg{width:11px}
+  .timer-block>strong{font-size:24px}
+  .timer-block>.timer-hint{font-size:8px;letter-spacing:0}
+  .status-metric>span,.difference-metric>span{font-size:9px;gap:3px}
+  .status-metric>span svg,.difference-metric>span svg{width:11px}
+  .status-metric>strong,.difference-metric>strong{font-size:21px}
+  .status-metric>small,.difference-metric>small{font-size:8px}
+  .candidate-grid{grid-template-columns:minmax(0,1fr);gap:3px;align-items:stretch}
+  .candidate-card{min-height:0;padding:11px 12px 9px;border-radius:11px}
+  .candidate-head{min-height:36px;gap:8px;align-items:center}
+  .candidate-label{gap:2px}
+  .side-name{font-size:15px;line-height:1.1}
+  .candidate-tag{font-size:9px;letter-spacing:.7px}
+  .side-share strong{font-size:25px}
+  .side-share strong small{font-size:14px}
+  .score-row{margin-top:1px}
+  .micro-label{font-size:10px;letter-spacing:.4px}
+  .score{font-size:36px;line-height:1}
+  .score-unit{font-size:10px}
+  .rose-total{font-size:15px}
+  .vote-progress{margin:6px 0 7px;height:5px}
+  .machine-holder{min-height:0}
+  .machine-caption{margin-bottom:4px;font-size:9px}
+  .machine-stage{min-height:0;gap:9px;justify-content:center}
+  .candidate-profile{max-width:46%;flex:1;gap:6px;padding:7px 6px;border-radius:9px}
+  .candidate-profile img{width:100%;max-width:108px;height:104px;border-radius:7px}
+  .candidate-description{gap:3px}
+  .candidate-description>strong{font-size:clamp(14px,4vw,18px);line-height:1.1}
+  .candidate-description .candidate-party{font-size:11px}
+  .candidate-office{font-size:10px;white-space:normal;line-height:1.15}
+  .machine{width:126px;height:164px;padding:6px 6px 4px}
+  .machine-top{height:11px;font-size:4px}
+  .machine-screen-wrap{height:67px;padding:3px}
+  .machine-screen{padding:4px}
+  .screen-head{font-size:4px}.screen-head strong{font-size:5px}
+  .screen-candidate{margin-top:3px}
+  .candidate-avatar{width:20px;height:21px;font-size:12px}
+  .screen-candidate>div:last-child span{font-size:4px}
+  .screen-candidate>div:last-child strong{font-size:13px}
+  .screen-person strong{font-size:5px}.screen-person span{font-size:4px}
+  .machine-controls{height:58px;padding:4px 3px 4px;gap:4px}
+  .keypad{width:68px;gap:2px}.key{font-size:5px}
+  .confirm-keys{width:34px;gap:3px}.confirm-keys>span{height:10px;font-size:3px}
+  .confirm-keys>.key-confirm{height:14px}
+  .machine-base{width:104px;height:9px;bottom:11px}
+  .machine-finger{font-size:14px;right:8px;top:102px}
+  .card-footer{height:22px;font-size:9px}
+  .card-footer>span:last-child{font-size:8px}
+  .versus{height:24px;flex-direction:row;gap:7px}
+  .versus>span{height:22px;width:25px;font-size:9px}
+  .versus>div{height:1px;width:40%;left:30%;top:50%}
+  .activity-strip{height:auto;min-height:48px;margin:8px 10px 0;padding:7px;gap:6px}
+  .activity-title{min-width:auto}.activity-title>div{display:none}
+  .activity-items{height:32px;padding-left:6px;gap:5px}
+  .activity-user b{font-size:9px;max-width:80px}.activity-user small{font-size:8px}
+  .event-vote{font-size:8px}.activity-time{display:none}
+  .empty-activity{font-size:9px}
+  .activity-rules{min-width:auto;gap:2px}
+  .activity-rules>span{font-size:9px;gap:3px}
+  .activity-rules small{font-size:8px;max-width:95px;text-align:right;line-height:1.3}
+  .match-result-backdrop{grid-template-columns:1fr 1fr}
+  .match-result-card{min-width:min(300px,calc(100vw - 28px));padding:18px 20px}
+  .match-result-card>strong{font-size:28px}
+}
