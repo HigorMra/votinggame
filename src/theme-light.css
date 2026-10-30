@@ -269,3 +269,36 @@ body{min-width:320px;background:#0c1a2b;color:#263244}
   .match-info h1{font-size:clamp(32px,8.8vw,45px);line-height:1.02}
   .side-share .share-label{font-size:12px;font-weight:900;letter-spacing:.4px}
 }
+
+/* Use the card header for one centered side + percentage label; reclaim room for portraits. */
+.candidate-head{justify-content:center;min-height:50px}
+.candidate-head .side-share{width:100%;margin:0;flex-direction:row;align-items:baseline;justify-content:center;gap:12px}
+.side-share .share-label{font-size:19px;font-weight:900;letter-spacing:.8px;color:#2d6497}
+.share-red .share-label{color:#b34853}
+.side-share strong{font-size:36px;font-weight:900}
+.side-share strong small{font-size:19px;font-weight:900}
+.candidate-card{padding:14px 16px 12px}
+.card-divider{margin:8px 0}
+.machine-stage{min-height:0;gap:12px}
+.candidate-profile{max-width:56%;padding:10px 9px;gap:8px}
+.candidate-profile img{max-width:164px;height:176px}
+.candidate-description{margin-top:6px;gap:5px}
+.candidate-description>strong{font-size:clamp(22px,2.7vw,28px);line-height:1.05}
+.candidate-description .candidate-party{font-size:15px}
+.candidate-office{font-size:14px;line-height:1.2}
+@media(max-width:700px), (max-aspect-ratio:4/5){
+  .candidate-head{min-height:48px}
+  .candidate-head .side-share{gap:11px}
+  .side-share .share-label{font-size:18px;letter-spacing:.6px}
+  .side-share strong{font-size:34px}
+  .side-share strong small{font-size:18px}
+  .candidate-card{padding:12px 13px 10px}
+  .card-divider{margin:7px 0}
+  .machine-stage{min-height:0;gap:9px}
+  .candidate-profile{max-width:56%;padding:8px 7px;gap:7px}
+  .candidate-profile img{max-width:150px;height:150px}
+  .candidate-description{margin-top:6px;gap:5px}
+  .candidate-description>strong{font-size:clamp(20px,6vw,25px);line-height:1.05}
+  .candidate-description .candidate-party{font-size:14px}
+  .candidate-office{font-size:13px;line-height:1.18}
+}
